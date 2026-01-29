@@ -21,7 +21,7 @@ Wage Quest helps workplace users who feel their time is being "wasted" during bo
 
 ## 🏗️ Architecture
 
-<img width="1024" height="1024" alt="wagequest" src="https://github.com/user-attachments/assets/889405e3-97fa-4fa2-b01c-20e82e1cc695" />
+<img width="676" height="438" alt="wagequest" src="https://github.com/user-attachments/assets/10f768fb-5683-465d-8556-7cef50004da7" />
 
 ---
 
