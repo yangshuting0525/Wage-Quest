@@ -1,121 +1,54 @@
-# Wage-Quest
+# ✨ Wage Quest ✨
 
-**版本：** V 1.0  
-**定位：** 职场情绪调节器 - 将枯燥的劳动时间具象化为流动的金钱收益
-**核心价值观：** 具象化、可视化、游戏化、即时反馈
+> **Workplace emotional regulator — visualizing dull labor time as a flowing stream of financial gain.**
 
----
+## Overview
+### 🧠 What Wage Quest does
 
-## 1. 项目背景与目标
-### 1.1 背景
-职场用户在面对无聊会议、重复性劳动或情绪低落时，往往感到时间被“浪费”。通过将抽象的时间转化为实时跳动的“入账金额”，能帮助用户获得即时的心理安慰和价值感知。
-### 1.2 目标
-- **情绪补偿：** 通过金钱增长的视觉刺激，抵消工作的枯燥感。
-- **目标驱动：** 将劳动与消费欲望挂钩，提升工作的动力。
-- **社交传播：** 凭借独特的“带薪结算单”风格，激发用户分享欲。
+Wage Quest helps workplace users who feel their time is being "wasted" during boring meetings, repetitive tasks, or low-mood periods. By converting abstract time into real-time jumping "income increments," it provides immediate psychological comfort and a sense of value perception.
 
----
+### ⭐ Core features
 
-## 2. 核心逻辑与公式
-- **输入参数：** 年薪（或月薪）、每周工作时长。
-- **折算公式：**
-  - 时薪 = 年薪 / (52周 × 每周工时)
-  - 分薪 = 时薪 / 60
-  - 秒薪 = 分薪 / 60
-- **实时累加：** 开启计时后，系统以“秒”为单位实时累加收益，数字保持动态变化。
+- 💹 **Real-time income visualization**: A core counter that displays the total amount earned since the timer started, using smooth "scrolling digit" animations.
+- 🎁 **Wishlist integration**: Link labor to consumption desires (e.g., AirPods, consoles). The system calculates "how much longer to work to afford them" and triggers a "PAID" stamp animation upon completion.
+- 👔 **Meeting Survival Mode**: Input expected meeting duration to see a countdown progress bar alongside the "heart-warming money" earned during the session.
+- 🍔 **Relative Value conversion**: Introduces "workplace hard currency" anchors (e.g., KFC meals, skincare products) to concretize income perception.
+- 🎖️ **Slacking Achievement System**: A gamified badge system (e.g., "Meeting Terminator," "Paid Suffering") to increase long-term user stickiness.
+- 👻 **Stealth Mode**: A one-key camouflage feature (hotkeys or floating ball) that instantly switches the page to a fake Excel sheet or code editor for security.
+- 🧾 **Daily Receipt export**: Generates a retro thermal-style long receipt at the end of the day, summarizing total duration, earnings, and goals achieved.
 
 ---
 
-## 3. 功能模块详情
+## 🏗️ Architecture
 
-### 3.1 基础模块：收入实时可视化
-- **功能描述：** 核心计数器，显示自计时开始以来赚取的总金额。
-- **交互要求：** 数字采用“滚动数字”动效，保持平滑增加，而非生硬跳变。
-- **数据展示：** 同时显示“已带薪摸鱼时长”和“今日预计总收入”。
 
-### 3.2 进阶模块：愿望清单 (Wishlist)
-- **功能描述：** 用户添加目标消费品（如 AirPods, 游戏主机）。
-- **动态转换：** 系统自动计算“还需工作多久即可购买”。
-- **成就反馈：** 当金额累计达到目标时，页面自动触发“PAID”红章盖下动效，并伴随洒花动画。
-
-### 3.3 专项模块：会议生存模式 (Meeting Survival Mode)
-- **设定逻辑：** 用户在入会前输入会议预计时长（如 60 分钟）。
-- **双向显示：** 
-  - 左侧：会议剩余时间倒计时进度条。
-  - 右侧：本场会议截止目前赚取的“窝心钱”。
-- **会后结算：** 结束时弹出结算浮层：“恭喜！你在这次无聊的会议中成功白嫖公司 XX 元。”
-
-### 3.4 趣味模块：消费等值转换 (Relative Value)
-- **逻辑：** 引入“职场硬通货”作为锚点。
-- **自动展示：** 实时在金额下方滚动显示等值物品。
-  - “当前收益可购买：1.5 份肯德基疯狂星期四”
-  - “当前收益可购买：0.2 支神仙水”
-- **作用：** 具象化收入，让用户觉得“再忍半小时，晚饭就能加个鸡腿了”。
-
-### 3.5 激励模块：摸鱼成就系统 (Badges)
-- **解锁逻辑：** 根据累计时长或金额分级。
-- **勋章设计：**
-  - **初级打工人：** 累计赚够一杯星巴克。
-  - **会议终结者：** 在会议模式下度过 10 场会议。
-  - **带薪难受：** 单次连续计时超过 4 小时。
-- **作用：** 引入游戏化机制，增加长期使用黏性。
-
-### 3.6 安全模块：一键伪装 (Stealth Mode)
-- **功能逻辑：** 针对“老板走近”的突发状况。
-- **触发方式：** 设置悬浮球或快捷键（如双击屏幕）。
-- **效果：** 瞬间将页面切换为伪装界面（Excel 表格、代码编辑器或日报撰写模板），确保使用安全性。
-
-### 3.7 分享模块：带薪结算导出 (Daily Receipt)
-- **功能描述：** 下班时生成汇总长图。
-- **视觉样式：** 模拟超市小票/热敏纸收据。
-- **包含内容：** 
-  - 日期及工号（随机生成）。
-  - 今日总摸鱼时长。
-  - 今日总收益。
-  - 已达成的愿望清单。
-  - 底部 Solgan：“带薪工作，体面摸鱼”。
 
 ---
 
-## 4. UI/UX 设计要求
-### 4.1 视觉风格
-- **主题：** 复古热敏纸收据风（Thermal Receipt Style）。
-- **背景：** 带有微弱纸质纹理的米白色。
-- **字体：** 采用等宽字体（如 Courier New）或数字翻页钟字体。
-- **点缀：** 边缘采用不规则锯齿撕裂效果，增加真实感。
+## 📘 How to use?
 
-### 4.2 动效建议
-- **金币流动：** 每增加 1 元，背景轻微漂浮起一个淡入淡出的金币符号。
-- **盖章反馈：** 愿望达成时的“PAID”印章需带有震动反馈（如果硬件支持）。
-- **进度条：** 会议进度条随时间流逝缓慢填充，呈现“加载财富”的视觉效果。
+1. **Configure Salary**: Enter your annual or monthly salary and weekly work hours.
+2. **Set Goals**: Add target items to your Wishlist with their respective prices.
+3. **Start Timer**: Initiate the "Quest" and watch your wealth grow second by second.
+4. **Meeting/Stealth**: Use specific modes to track meeting earnings or hide the interface from your boss.
 
 ---
 
-## 5. 非功能性需求
-- **数据持久化：** 用户输入的薪资信息及未完成的愿望清单应保存在本地（LocalStorage），防止刷新页面数据丢失。
-- **性能：** 实时计数的计算逻辑需高效，避免长时间开启导致的浏览器卡顿。
-- **隐私：** 所有薪资数据仅保存在用户本地，不上传服务器，确保隐私安全。
+## 🛡️ Privacy & Security
+
+- **Local Persistence**: All salary information and wishlists are stored in the user's `LocalStorage` to prevent data loss.
+- **No Server Upload**: All sensitive data remains strictly on the user's local device, ensuring absolute privacy.
+- **High Performance**: Optimized calculation logic to prevent browser lag during long-duration tracking.
 
 ---
 
-**结语：**
-该工具不单纯是一个计时器，而是一个通过“金钱量化”来对抗职场内耗的情绪解压阀。通过视觉上的“获得感”，让枯燥的工作时间转化为可期待的消费目标。
+## 🌟 Roadmap
 
+Planned improvements:
+- **Social Sharing**: Enhanced "Daily Receipt" templates for social media sharing.
+- **Goal-Driven Growth**: Deeper integration between labor metrics and consumption motivation.
+- **Emotional Compensation**: Additional visual stimuli to offset workplace boredom.
 
+---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+**Final Note**: This tool is an emotional pressure valve against workplace burnout through financial quantification.
