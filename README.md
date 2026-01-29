@@ -22,9 +22,7 @@ Wage Quest helps workplace users who feel their time is being "wasted" during bo
 ## 🏗️ Architecture
 
 ![Demo](assets/demo.png)
-![Demo1](assets/demo1.png)
-![Demo2](assets/demo2.png)
-![Demo3](assets/demo3.png)
+![Demo5](assets/demo5.png)
 
 ---
 
