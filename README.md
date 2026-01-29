@@ -21,12 +21,13 @@ Wage Quest helps workplace users who feel their time is being "wasted" during bo
 
 ## 🏗️ Architecture
 
-
+<img width="1024" height="1024" alt="wagequest" src="https://github.com/user-attachments/assets/889405e3-97fa-4fa2-b01c-20e82e1cc695" />
 
 ---
 
 ## 📘 How to use?
 > **Download(clone) index_2.0.html to your local machine, then open it in a web browser.**
+
 1. **Configure Salary**: Enter your annual salary and weekly work hours.
 2. **Set Goals**: Add target items to your Wishlist with their respective prices.
 3. **Start Timer**: Initiate the "Quest" and watch your wealth grow second by second.
