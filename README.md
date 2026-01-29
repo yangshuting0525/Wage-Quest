@@ -26,11 +26,11 @@ Wage Quest helps workplace users who feel their time is being "wasted" during bo
 ---
 
 ## 📘 How to use?
-
-1. **Configure Salary**: Enter your annual or monthly salary and weekly work hours.
+> **Download(clone) index_2.0.html to your local machine, then open it in a web browser.**
+1. **Configure Salary**: Enter your annual salary and weekly work hours.
 2. **Set Goals**: Add target items to your Wishlist with their respective prices.
 3. **Start Timer**: Initiate the "Quest" and watch your wealth grow second by second.
-4. **Meeting/Stealth**: Use specific modes to track meeting earnings or hide the interface from your boss.
+4. **Meeting**: Use meeting modes to track meeting earnings or hide the interface from your boss.
 
 ---
 
