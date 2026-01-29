@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAGE QUEST - 收入可视化工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background: linear-gradient(135deg, #f5f5dc 0%, #ede8d5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .receipt {
+            background: #faf9f6;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.6s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Zigzag top edge - realistic torn paper zigzag */
+        .zigzag-top {
+            height: 0;
+            overflow: visible;
+        }
+        
+        .zigzag-top::before {
+            content: '';
+            display: block;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20' preserveAspectRatio='none'%3E%3Cpath d='M0,20 L20,0 L40,20 Z' fill='%23faf9f6'/%3E%3C/svg%3E");
+            background-size: 40px 20px;
+            background-repeat: repeat-x;
+        }
+
+        .content {
+            padding: 30px 40px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 40px;
+            color: #000;
+            letter-spacing: 0.3em;
+            font-weight: 900;
+            margin-bottom: 0;
+            font-family: 'Courier New', 'Courier', monospace;
+            text-transform: uppercase;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .header .description {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Input section */
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        .input-field label {
+            display: block;
+            font-size: 13px;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 8px;
+            font-weight: 900;
+            font-family: 'Courier New', 'Courier', monospace;
+        }
+
+        .input-field input {
+            font-family: 'Comic Sans MS', 'Courier New', monospace;
+            font-size: 36px;
+            font-weight: bold;
+            color: #999;
+            border: none;
+            border-bottom: 2px solid #ccc;
+            background: transparent;
+            width: 100%;
+            padding: 8px 0;
+            transition: all 0.3s;
+            letter-spacing: 0.05em;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            border-bottom-color: #666;
+            color: #666;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            font-family: 'Courier New', monospace;
+            font-size: 17px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            padding: 18px;
+            border: 3px solid;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-start {
+            border-color: #2d2d2d;
+            color: #2d2d2d;
+        }
+
+        .btn-start:hover {
+            background: #2d2d2d;
+            color: white;
+        }
+
+        .btn-stop {
+            border-color: #8b4444;
+            color: #5d2d2d;
+            background: #f5e6e6;
+        }
+
+        .btn-stop:hover {
+            background: #8b4444;
+            color: white;
+        }
+
+        /* Progress section */
+        .progress-section {
+            margin-bottom: 25px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 10px;
+            font-weight: 400;
+            font-family: 'Courier New', 'Courier', monospace;
+        }
+
+        .progress-bar {
+            height: 30px;
+            border: 2px solid #2d2d2d;
+            background: white;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2d2d2d;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Divider dots */
+        .divider {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding: 25px 0;
+        }
+
+        .divider span {
+            width: 4px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        /* Earnings display */
+        .earnings-section {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+        }
+
+        .earnings-label {
+            font-size: 24px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+            font-weight: 400;
+            font-family: 'Courier New', 'Courier', monospace;
+        }
+
+        .earnings-amount {
+            font-size: 72px;
+            font-weight: 900;
+            color: #000;
+            margin-bottom: 15px;
+            line-height: 1;
+            transition: transform 0.3s;
+            font-family: 'Courier New', 'Courier', monospace;
+            letter-spacing: 0.08em;
+        }
+
+        .earnings-amount.pulse {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .earnings-note {
+            font-size: 11px;
+            color: #999;
+            letter-spacing: 0.05em;
+        }
+
+        /* Wishlist section */
+        .wishlist-section {
+            margin-top: 30px;
+            border-top: 2px dashed #ccc;
+            padding-top: 30px;
+        }
+
+        .wishlist-header {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 0.25em;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            font-family: 'Courier New', 'Courier', monospace;
+            color: #000;
+        }
+
+        .wishlist-item {
+            background: #fff9e6;
+            border: 2px solid #f0e68c;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .wishlist-item.completed {
+            background: #e6f5e6;
+            border-color: #90ee90;
+        }
+
+        .wishlist-item-info {
+            flex: 1;
+        }
+
+        .wishlist-item-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .wishlist-item-progress {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .wishlist-item-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-right: 15px;
+        }
+
+        .wishlist-item-status {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a7c4a;
+        }
+
+        /* PAID stamp - completely static, no animation */
+        .paid-stamp {
+            position: absolute;
+            top: 50%;
+            right: 80px;
+            transform: translateY(-50%) rotate(15deg);
+            font-size: 40px;
+            font-weight: 900;
+            color: rgba(210, 180, 140, 0.5);
+            border: 5px solid rgba(210, 180, 140, 0.5);
+            padding: 8px 24px;
+            border-radius: 3px;
+            background: transparent;
+            letter-spacing: 0.4em;
+            font-family: 'Courier New', 'Courier', monospace;
+            text-transform: uppercase;
+            opacity: 1;
+        }
+
+        /* Confetti ribbon animation - small, tiny, short, 100% opacity */
+        .confetti {
+            position: absolute;
+            width: 4px;
+            height: 8px;
+            animation: confettiFall 2s ease-out forwards;
+            pointer-events: none;
+            border-radius: 1px;
+            opacity: 1;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                top: -20px;
+                opacity: 1;
+                transform: translateY(0) rotateZ(0deg);
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+                transform: translateY(0) rotateZ(720deg);
+            }
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.2s;
+        }
+
+        .delete-btn:hover {
+            color: #ff4444;
+        }
+
+        /* Add item form */
+        .add-item-form {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            margin-top: 20px;
+            align-items: end;
+        }
+
+        .add-item-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .add-item-input label {
+            font-size: 13px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            letter-spacing: 0.1em;
+            font-weight: 400;
+            font-family: 'Courier New', 'Courier', monospace;
+        }
+
+        .add-item-input input {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        .add-item-input input:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        .add-btn {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: 2px solid #4a7c4a;
+            background: #e6f5e6;
+            color: #4a7c4a;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background: #4a7c4a;
+            color: white;
+        }
+
+        /* Quick add icons */
+        .quick-icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            font-size: 24px;
+            background: none;
+            border: 2px solid #ddd;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+
+        .icon-btn:hover {
+            border-color: #666;
+            background: #f5f5f5;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 2px dashed #ccc;
+            margin-top: 30px;
+        }
+
+        .footer-time {
+            font-size: 10px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        /* Bottom dots */
+        .dots-bottom {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 20px;
+            background: #faf9f6;
+        }
+
+        .dots-bottom span {
+            width: 8px;
+            height: 8px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt">
+        <div class="zigzag-top"></div>
+        
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                <h1>WAGE QUEST</h1>
+            </div>
+
+            <!-- Salary Inputs -->
+            <div class="input-group">
+                <div class="input-field">
+                    <label>Annual Salary</label>
+                    <input type="number" id="annualSalary" value="300000" min="0">
+                </div>
+                <div class="input-field">
+                    <label>Hours/Wk</label>
+                    <input type="number" id="weeklyHours" value="40" min="1" max="168">
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="button-group">
+                <button class="btn btn-start" id="startBtn">PAUSE ⏸</button>
+                <button class="btn btn-stop" id="stopBtn">END MY WORK ⊙</button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span>WORK PROGRESS</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="divider">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+
+            <!-- Earnings Display -->
+            <div class="earnings-section">
+                <div class="earnings-label">CAREER EARNINGS</div>
+                <div class="earnings-amount" id="totalEarned">¥0.00</div>
+                <div class="time-elapsed" id="timeElapsed" style="font-size: 20px; color: #666; margin-top: 18px; font-family: 'Courier New', monospace; font-weight: 900; letter-spacing: 0.1em;">
+                    0d 0h 0m 0s
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="divider">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+
+            <!-- Wishlist Section -->
+            <div class="wishlist-section">
+                <div class="wishlist-header">-- WISHLIST QUEUE --</div>
+                
+                <div id="wishlistItems">
+                    <!-- Wishlist items will be added here dynamically -->
+                </div>
+
+                <!-- Add Item Form -->
+                <div class="add-item-form">
+                    <div class="add-item-input">
+                        <label>ADD ENTRY:</label>
+                        <input type="text" id="itemName" placeholder="Item Name">
+                    </div>
+                    <div class="add-item-input">
+                        <label>¥</label>
+                        <input type="number" id="itemPrice" placeholder="Price" style="width: 120px;">
+                    </div>
+                    <button class="add-btn" id="addBtn">ADD +</button>
+                </div>
+
+                <!-- Quick icon buttons -->
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px;">
+                    <button class="icon-btn" onclick="addWithIcon('☕', 'Coffee', 5)" title="Coffee">☕</button>
+                    <button class="icon-btn" onclick="addWithIcon('🍕', 'Pizza', 15)" title="Pizza">🍕</button>
+                    <button class="icon-btn" onclick="addWithIcon('🎬', 'Movie', 12)" title="Movie">🎬</button>
+                    <button class="icon-btn" onclick="addWithIcon('🎧', 'Music', 10)" title="Music">🎧</button>
+                    <button class="icon-btn" onclick="addWithIcon('📱', 'Phone', 999)" title="Phone">📱</button>
+                    <button class="icon-btn" onclick="addWithIcon('🎮', 'Game', 60)" title="Game">🎮</button>
+                    <button class="icon-btn" onclick="addWithIcon('👕', 'Clothes', 50)" title="Clothes">👕</button>
+                    <button class="icon-btn" onclick="addWithIcon('🎁', 'Gift', 30)" title="Gift">🎁</button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-time" id="footerTime"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Dots -->
+        <div class="dots-bottom">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let isWorking = false;
+        let sessionSeconds = 0;
+        let totalEarned = 0;
+        let interval = null;
+        let wishlist = [];
+
+        // Save data to localStorage
+        function saveData() {
+            const data = {
+                isWorking,
+                sessionSeconds,
+                totalEarned,
+                wishlist,
+                lastSaveTime: Date.now()
+            };
+            localStorage.setItem('wageQuestData', JSON.stringify(data));
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('wageQuestData');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    isWorking = data.isWorking || false;
+                    sessionSeconds = data.sessionSeconds || 0;
+                    totalEarned = data.totalEarned || 0;
+                    wishlist = data.wishlist || [];
+                    
+                    // If was working, calculate time passed
+                    if (isWorking && data.lastSaveTime) {
+                        const timePassed = Math.floor((Date.now() - data.lastSaveTime) / 1000);
+                        sessionSeconds += timePassed;
+                        const perSecond = calculateRates();
+                        totalEarned += perSecond * timePassed;
+                    }
+                    
+                    updateDisplay();
+                    
+                    // Resume working if it was running
+                    if (isWorking) {
+                        startBtn.textContent = 'PAUSE ⏸';
+                        totalEarnedEl.classList.add('pulse');
+                        interval = setInterval(() => {
+                            sessionSeconds++;
+                            const perSecond = calculateRates();
+                            totalEarned += perSecond;
+                            saveData();
+                            updateDisplay();
+                            checkWishlistCompletion();
+                        }, 1000);
+                    }
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                }
+            }
+        }
+
+        // DOM Elements
+        const annualSalaryInput = document.getElementById('annualSalary');
+        const weeklyHoursInput = document.getElementById('weeklyHours');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressFill = document.getElementById('progressFill');
+        const totalEarnedEl = document.getElementById('totalEarned');
+        const timeElapsedEl = document.getElementById('timeElapsed');
+        const footerTime = document.getElementById('footerTime');
+        const wishlistItems = document.getElementById('wishlistItems');
+        const itemNameInput = document.getElementById('itemName');
+        const itemPriceInput = document.getElementById('itemPrice');
+        const addBtn = document.getElementById('addBtn');
+
+        // Calculate rates
+        function calculateRates() {
+            const annualSalary = parseFloat(annualSalaryInput.value) || 0;
+            const weeklyHours = parseFloat(weeklyHoursInput.value) || 40;
+            
+            const perSecond = annualSalary / (52 * weeklyHours * 3600);
+            return perSecond;
+        }
+
+        // Format number with commas
+        function formatMoney(num) {
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Update display
+        function updateDisplay() {
+            totalEarnedEl.textContent = `¥${formatMoney(totalEarned)}`;
+            
+            const progressPercentValue = Math.min((sessionSeconds / 3600) * 100, 100);
+            progressPercent.textContent = `${Math.floor(progressPercentValue)}%`;
+            progressFill.style.width = `${progressPercentValue}%`;
+
+            // Update time elapsed display
+            const days = Math.floor(sessionSeconds / 86400);
+            const hours = Math.floor((sessionSeconds % 86400) / 3600);
+            const minutes = Math.floor((sessionSeconds % 3600) / 60);
+            const seconds = sessionSeconds % 60;
+            timeElapsedEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+            // Update wishlist progress
+            updateWishlistDisplay();
+        }
+
+        // Start working
+        function startWorking() {
+            if (isWorking) return;
+            
+            isWorking = true;
+            startBtn.textContent = 'PAUSE ⏸';
+            totalEarnedEl.classList.add('pulse');
+            
+            interval = setInterval(() => {
+                sessionSeconds++;
+                const perSecond = calculateRates();
+                totalEarned += perSecond;
+                saveData();
+                updateDisplay();
+                checkWishlistCompletion();
+            }, 1000);
+        }
+
+        // Stop working
+        function stopWorking() {
+            if (!isWorking) return;
+            
+            isWorking = false;
+            startBtn.textContent = '▶ START';
+            totalEarnedEl.classList.remove('pulse');
+            
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+            }
+            saveData();
+        }
+
+        // Add wishlist item
+        function addWishlistItem(name, price, icon = '🎁') {
+            const id = Date.now();
+            wishlist.push({
+                id,
+                name,
+                price,
+                icon,
+                completed: false
+            });
+            // Sort by price (low to high)
+            wishlist.sort((a, b) => a.price - b.price);
+            saveData();
+            updateWishlistDisplay();
+        }
+
+        // Remove wishlist item
+        function removeWishlistItem(id) {
+            wishlist = wishlist.filter(item => item.id !== id);
+            saveData();
+            updateWishlistDisplay();
+        }
+
+        // Update wishlist display
+        function updateWishlistDisplay() {
+            wishlistItems.innerHTML = '';
+            
+            wishlist.forEach(item => {
+                const progress = Math.min((totalEarned / item.price) * 100, 100);
+                const canAfford = totalEarned >= item.price;
+                
+                const itemEl = document.createElement('div');
+                itemEl.className = `wishlist-item ${canAfford ? 'completed' : ''}`;
+                
+                itemEl.innerHTML = `
+                    <div class="wishlist-item-icon" style="font-size: 32px; margin-right: 15px;">${item.icon || '🎁'}</div>
+                    <div class="wishlist-item-info">
+                        <div class="wishlist-item-name">${item.name}</div>
+                        <div class="wishlist-item-progress">${progress.toFixed(0)}% earned</div>
+                    </div>
+                    <div class="wishlist-item-price">¥${formatMoney(item.price)}</div>
+                    ${canAfford ? '<div class="paid-stamp">PAID</div>' : ''}
+                    <button class="delete-btn" onclick="removeWishlistItem(${item.id})">×</button>
+                `;
+                
+                wishlistItems.appendChild(itemEl);
+            });
+        }
+
+        // Check wishlist completion
+        function checkWishlistCompletion() {
+            wishlist.forEach(item => {
+                if (!item.completed && totalEarned >= item.price) {
+                    item.completed = true;
+                    celebrateCompletion();
+                }
+            });
+        }
+
+        // Celebration animation with colorful ribbons
+        function celebrateCompletion() {
+            // Play celebration sound
+            playSuccessSound();
+            
+            // Create colorful ribbon confetti - small and subtle
+            const colors = [
+                '#FF6B9D', // 粉红
+                '#C44569', // 玫瑰红
+                '#FFA07A', // 浅橙
+                '#FFD93D', // 黄色
+                '#6BCB77', // 绿色
+                '#4D96FF', // 蓝色
+                '#9D84B7', // 紫色
+                '#FF6B6B', // 红色
+                '#4ECDC4', // 青色
+                '#95E1D3'  // 薄荷绿
+            ];
+            
+            // Create 60 small ribbons (perfect balance)
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    
+                    // Random color
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Random position
+                    confetti.style.left = Math.random() * 100 + '%';
+                    
+                    // Smaller size - tiny particles
+                    const width = 3 + Math.random() * 3;   // 3-6px
+                    const height = 6 + Math.random() * 6;  // 6-12px
+                    confetti.style.width = width + 'px';
+                    confetti.style.height = height + 'px';
+                    
+                    // Random animation timing
+                    confetti.style.animationDelay = Math.random() * 0.3 + 's';
+                    confetti.style.animationDuration = (1.8 + Math.random() * 0.8) + 's';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 20);
+            }
+        }
+
+        // Play success sound
+        function playSuccessSound() {
+            // Create AudioContext for celebration sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Play a cheerful ascending melody
+            const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C (major chord)
+            
+            notes.forEach((frequency, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                const startTime = audioContext.currentTime + index * 0.15;
+                const duration = 0.3;
+                
+                gainNode.gain.setValueAtTime(0.3, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                
+                oscillator.start(startTime);
+                oscillator.stop(startTime + duration);
+            });
+        }
+
+        // Quick add function
+        function quickAdd(name, price) {
+            addWishlistItem(name, price);
+        }
+
+        // Update footer time
+        function updateFooterTime() {
+            const now = new Date();
+            footerTime.textContent = now.toLocaleString();
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', () => {
+            if (isWorking) {
+                stopWorking();
+            } else {
+                startWorking();
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            stopWorking();
+            sessionSeconds = 0;
+            totalEarned = 0;
+            
+            // Reset all wishlist items to not completed
+            wishlist.forEach(item => {
+                item.completed = false;
+            });
+            
+            saveData();
+            updateDisplay();
+        });
+
+        addBtn.addEventListener('click', () => {
+            const name = itemNameInput.value.trim();
+            const price = parseFloat(itemPriceInput.value);
+            
+            if (name && price > 0) {
+                addWishlistItem(name, price, '🎁');  // Default icon
+                itemNameInput.value = '';
+                itemPriceInput.value = '';
+            }
+        });
+
+        // Quick add with icon
+        function addWithIcon(icon, name, price) {
+            addWishlistItem(name, price, icon);
+        }
+
+        // Enter key to add item
+        itemPriceInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addBtn.click();
+            }
+        });
+
+        annualSalaryInput.addEventListener('input', updateDisplay);
+        weeklyHoursInput.addEventListener('input', updateDisplay);
+
+        // Initial setup
+        loadData();
+        updateDisplay();
+        updateFooterTime();
+        setInterval(updateFooterTime, 1000);
+    </script>
+</body>
+</html>
